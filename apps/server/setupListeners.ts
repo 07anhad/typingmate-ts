@@ -1,17 +1,16 @@
 import { Server } from "socket.io";
 import { Game } from "./classes/Game";
 
-const rooms = new Map<string, Game>() // actual game instance, string - roomId. Game -  object 
+const rooms = new Map<string, Game>(); // actual game instance, string - roomId. Game -  object 
 
 export function setupListeners(io: Server) {
   io.on("connection", (socket) => {
     console.log(`new connection - ${socket.id}`);
 
     socket.on('join-game', (roomId: string, name: string) => {
-      //whenever someone tries to join a game, we need the room id and name
+      // Whenever someone tries to join a game, we need the room id and name
       if (!roomId) {
         return socket.emit("error", "invalid room id");
-        //'return is used, if wrong room id or name is provided, the execution of the program wont continue and willl terminate at this point'
       }
 
       if (!name) {
@@ -24,10 +23,14 @@ export function setupListeners(io: Server) {
         const game = rooms.get(roomId);
 
         if (!game) return socket.emit("error", "game not found");
+
+        game.joinPlayer(socket.id, name, socket);
       }
       else {
-
+        const game = new Game(roomId, io, socket.id, [], ''); // Create a new game instance
+        rooms.set(roomId, game); // Add the new game instance to the rooms map
+        game.joinPlayer(socket.id, name, socket); // Join the player to the newly created game
       }
-    })
-  })
+    });
+  });
 }
