@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
-import { Game } from "./classes/Game";
+import { Game } from "./classes/game";
 
-const rooms = new Map<string, Game>(); // actual game instance, string - roomId. Game -  object 
+export const rooms = new Map<string, Game>(); // actual game instance, string - roomId. Game -  object 
 
 export function setupListeners(io: Server) {
   io.on("connection", (socket) => {
